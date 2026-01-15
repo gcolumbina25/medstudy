@@ -1,0 +1,151 @@
+.cyclePage {
+  min-height: 100vh;
+  background: var(--bg-primary);
+}
+
+.hero {
+  position: relative;
+  height: 400px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heroOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(10, 8, 21, 0.95));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+}
+
+.backButton {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: rgba(20, 16, 40, 0.8);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-family: 'Stack Sans Notch', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.backButton:hover {
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  background: rgba(168, 85, 247, 0.15);
+}
+
+.heroOverlay h1 {
+  font-size: 3rem;
+  color: #ffffff;
+  margin-bottom: 15px;
+  font-weight: 700;
+  font-family: 'Stack Sans Notch', sans-serif;
+}
+
+.heroOverlay p {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 800px;
+}
+
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.topicsContainer {
+  margin-top: 20px;
+}
+
+.topicsTitle {
+  font-size: 2rem;
+  color: #ffffff;
+  margin-bottom: 30px;
+  padding-left: 10px;
+  border-left: 4px solid var(--accent-primary);
+  font-weight: 600;
+  font-family: 'Stack Sans Notch', sans-serif;
+}
+
+.topicsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 24px;
+  padding: 0 10px;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-secondary);
+}
+
+.loading, .error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 20px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid var(--bg-secondary);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error button {
+  background: var(--accent-gradient);
+  border: none;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-family: 'Stack Sans Notch', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+}
+
+@media (max-width: 768px) {
+  .hero {
+    height: 300px;
+  }
+
+  .heroOverlay h1 {
+    font-size: 2rem;
+  }
+
+  .heroOverlay p {
+    font-size: 1rem;
+  }
+
+  .main {
+    padding: 30px 15px;
+  }
+
+  .topicsGrid {
+    grid-template-columns: 1fr;
+  }
+}

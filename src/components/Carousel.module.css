@@ -1,0 +1,76 @@
+.carouselContainer {
+  position: relative;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.carouselContainer.comingSoon {
+  opacity: 0.7;
+  filter: grayscale(100%);
+}
+
+.carousel {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  padding: 10px 0;
+}
+
+.carousel::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.carouselContent {
+  display: flex;
+  gap: 20px;
+  padding: 0 20px;
+}
+
+.arrowButton {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(20, 16, 40, 0.9);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.arrowButton:hover {
+  background: rgba(168, 85, 247, 0.3);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.leftArrow {
+  left: 0;
+}
+
+.rightArrow {
+  right: 0;
+}
+
+/* Mobile: ocultar setas e usar scroll touch */
+@media (max-width: 768px) {
+  .arrowButton {
+    display: none;
+  }
+
+  .carouselContent {
+    padding: 0 15px;
+    gap: 15px;
+  }
+}

@@ -1,0 +1,74 @@
+.statusSelector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.statusButton {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: var(--bg-card);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Stack Sans Notch', sans-serif;
+  backdrop-filter: blur(10px);
+  height: 48px;
+}
+
+.statusButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.statusButton.active {
+  border-width: 2px;
+  box-shadow: 0 0 20px var(--accent-glow),
+              0 2px 10px rgba(168, 85, 247, 0.15);
+}
+
+.statusIcon {
+  font-size: 1.3rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.statusLabel {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  font-weight: 500;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .statusSelector {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .statusButton {
+    padding: 8px 12px;
+    height: 44px;
+  }
+
+  .statusIcon {
+    font-size: 1.2rem;
+  }
+
+  .statusLabel {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .statusSelector {
+    grid-template-columns: 1fr;
+  }
+
+  .statusButton {
+    height: 42px;
+  }
+}

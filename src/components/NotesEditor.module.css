@@ -1,0 +1,60 @@
+.notesEditor {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.notesHeader {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.saveStatus {
+  font-size: 0.85rem;
+  font-family: 'Stack Sans Notch', sans-serif;
+}
+
+.saving {
+  color: var(--accent-primary);
+}
+
+.saved {
+  color: var(--accent-primary);
+}
+
+.unsaved {
+  color: var(--text-secondary);
+}
+
+.textarea {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 16px;
+  color: var(--text-primary);
+  font-family: 'Stack Sans Notch', sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  resize: vertical;
+  min-height: 200px;
+  transition: all 0.3s ease;
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 3px var(--accent-glow),
+              0 0 20px rgba(168, 85, 247, 0.1);
+}
+
+.textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 480px) {
+  .textarea {
+    min-height: 150px;
+    font-size: 0.9rem;
+  }
+}
