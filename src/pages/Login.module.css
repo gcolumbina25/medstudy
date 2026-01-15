@@ -71,7 +71,8 @@
 }
 
 .logoIcon {
-  color: #a855f7;
+  height: 2.2rem;
+  width: auto;
   flex-shrink: 0;
   filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
 }
