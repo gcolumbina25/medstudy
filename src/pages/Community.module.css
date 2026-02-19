@@ -1,7 +1,10 @@
+.communityContainer {
+  background: linear-gradient(180deg, #141028 0%, #100d1e 100%);
+  min-height: 100vh;
+}
+
 .main {
-  flex-grow: 1;
   padding: 30px 50px;
-  overflow-y: auto; /* Permite scroll apenas no conteúdo principal */
   color: #e2e2e2;
 }
 
