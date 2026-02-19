@@ -27,6 +27,7 @@ const Header = () => {
           <Link to="/" className={styles.navLink}>Início</Link>
           <Link to="/revisao" className={styles.navLink}>Revisão</Link>
           <Link to="/biblioteca" className={styles.navLink}>Biblioteca</Link>
+          <Link to="/comunidade" className={styles.navLink}>Comunidade</Link> {/* Novo link */}
           {userData?.isAdmin && (
             <Link to="/admin" className={styles.navLink}>Admin</Link>
           )}

@@ -9,6 +9,7 @@ import LessonPage from './pages/LessonPage';
 import RevisaoPage from './pages/RevisaoPage';
 import LibraryPage from './pages/LibraryPage';
 import AdminPage from './pages/AdminPage';
+import Community from './pages/Community'; // Importa a nova página
 import './App.css';
 
 function AppRoutes() {
@@ -129,11 +130,19 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route
+       <Route
         path="/biblioteca"
         element={
           <ProtectedRoute>
             <LibraryPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/comunidade"
+        element={
+          <ProtectedRoute>
+            <Community />
           </ProtectedRoute>
         }
       />

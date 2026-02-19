@@ -1,0 +1,185 @@
+/* Container principal da página */
+.communityContainer {
+  padding: 40px;
+  background-color: #f0f2f5;
+  min-height: 100vh;
+  font-family: 'Inter', sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Cabeçalho da página */
+.header {
+  text-align: left;
+  margin-bottom: 40px;
+}
+
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.header p {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+/* Estilos para as seções */
+.publicationBox, .filtersBox, .contentList {
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  margin-bottom: 30px;
+}
+
+.publicationBox h2, .filtersBox h2, .contentList h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 25px;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 15px;
+}
+
+/* Estilos do Formulário */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formRow {
+  display: flex;
+  gap: 20px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formGroupFlex {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.formInput, .formSelect, .formTextarea, .searchInput, .filterSelect {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #1f2937;
+  background-color: #f9fafb;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.formInput:focus, .formSelect:focus, .formTextarea:focus, .searchInput:focus, .filterSelect:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.formInput::placeholder, .formTextarea::placeholder, .searchInput::placeholder {
+  color: #9ca3af;
+}
+
+.formTextarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.submitButton {
+  align-self: flex-end;
+  padding: 12px 24px;
+  background-color: #4f46e5;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover {
+  background-color: #4338ca;
+}
+
+/* Filtros e Busca */
+.filterControls {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: center;
+}
+
+.filterSelect {
+  max-width: 200px;
+}
+
+/* Grid de Cards e Mensagens */
+.cardsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.noResults {
+  text-align: center;
+  padding: 40px;
+  color: #6b7280;
+  font-size: 1.1rem;
+}
+
+.error, .success {
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+.error {
+  color: #ef4444;
+  background-color: rgba(239, 68, 68, 0.1);
+}
+
+.success {
+  color: #10b981;
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+/* Media query para responsividade */
+@media (max-width: 768px) {
+  .filterControls {
+    grid-template-columns: 1fr;
+  }
+  .filterSelect {
+    max-width: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .formRow {
+    flex-direction: column;
+  }
+  .communityContainer {
+    padding: 20px;
+  }
+  .header h1 {
+    font-size: 2rem;
+  }
+}
