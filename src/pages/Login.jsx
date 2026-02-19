@@ -47,6 +47,9 @@ const Login = () => {
           >
             {loading ? 'Entrando...' : 'Entrar com Google'}
           </button>
+          <p className={styles.loginDisclaimer}>
+            Toque no botão para fazer login com sua conta do Google. Se não tiver cadastro, entre em contato com o administrador.
+          </p>
         </div>
       </div>
     </div>

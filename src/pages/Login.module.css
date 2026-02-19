@@ -164,6 +164,14 @@
   backdrop-filter: blur(10px);
 }
 
+.loginDisclaimer {
+  font-family: 'Stack Sans Notch', sans-serif;
+  font-size: 0.8rem;
+  color: #b0b0b0;
+  text-align: center;
+  margin-top: -5px; /* Adjust as needed */
+}
+
 @media (max-width: 480px) {
   .loginCard {
     padding: 30px 20px;
