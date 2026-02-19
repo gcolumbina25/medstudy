@@ -72,7 +72,7 @@ const Community = () => {
     <main className={styles.main}>
       <div className={styles.header}>
         <h1>Comunidade</h1>
-        <p>Compartilhe materiais de estudo e interaja com outros usuários.</p>
+        <p>Explore conteúdos compartilhados pela comunidade e contribua com novos materiais.</p>
       </div>
 
       <section className={styles.publicationBox}>
