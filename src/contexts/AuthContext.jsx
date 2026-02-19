@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+Animport { createContext, useContext, useEffect, useState } from 'react';
 import { 
   signOut, 
   onAuthStateChanged,
@@ -27,50 +27,29 @@ export const AuthProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setCurrentUser(user);
-        try {
-          // Buscar dados do usuário
-          const userDoc = await getDoc(doc(db, 'users', user.uid));
-          if (userDoc.exists()) {
-            const data = userDoc.data();
-            setUserData(data);
-            
-            // Verificar se usuário está bloqueado
-            if (data.blocked) {
-              await signOut(auth);
-              alert('Sua conta foi bloqueada pelo administrador.');
-              return;
-            }
-            
-            // Atualizar último acesso
-            try {
-              await updateDoc(doc(db, 'users', user.uid), {
-                lastAccess: serverTimestamp()
-              });
-            } catch (error) {
-              console.warn('Não foi possível atualizar último acesso:', error);
-            }
-          } else {
-            // Se o documento não existe, criar um básico
-            console.warn('Documento do usuário não encontrado. Criando documento básico...');
-            try {
-              await setDoc(doc(db, 'users', user.uid), {
-                email: user.email,
-                isAdmin: false,
-                blocked: false,
-                createdAt: serverTimestamp(),
-                lastAccess: serverTimestamp()
-              });
-              setUserData({
-                email: user.email,
-                isAdmin: false,
-                blocked: false
-              });
-            } catch (error) {
-              console.error('Erro ao criar documento do usuário:', error);
-            }
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          setUserData(data);
+
+          if (data.blocked) {
+            await signOut(auth);
+            // The user will be signed out, and this will trigger onAuthStateChanged again
+            // which will lead to a clean state.
+            return;
           }
-        } catch (error) {
-          console.error('Erro ao buscar dados do usuário:', error);
+
+          try {
+            await updateDoc(userDocRef, { lastAccess: serverTimestamp() });
+          } catch (error) {
+            console.warn('Não foi possível atualizar último acesso:', error);
+          }
+        } else {
+          // If user is authenticated in Firebase but not in our Firestore db,
+          // it's an unauthorized user. Sign them out.
+          await signOut(auth);
         }
       } else {
         setCurrentUser(null);
@@ -88,7 +67,6 @@ export const AuthProvider = ({ children }) => {
       const userCredential = await signInWithPopup(auth, provider);
       const user = userCredential.user;
 
-      // Check if user document exists
       const userDocRef = doc(db, 'users', user.uid);
       const userDoc = await getDoc(userDocRef);
 
@@ -98,24 +76,17 @@ export const AuthProvider = ({ children }) => {
           await signOut(auth);
           throw new Error('Sua conta foi bloqueada pelo administrador.');
         }
-        // Update last login
         await updateDoc(userDocRef, {
           lastLogin: serverTimestamp(),
-          sessionToken: Date.now().toString()
         });
+        return userCredential;
       } else {
-        // Create a new document if it doesn't exist
-        await setDoc(userDocRef, {
-          email: user.email,
-          isAdmin: false,
-          blocked: false,
-          createdAt: serverTimestamp(),
-          lastLogin: serverTimestamp(),
-          sessionToken: Date.now().toString()
-        });
+        // If the user document does not exist, they are not authorized.
+        await signOut(auth); // Sign them out from Firebase Authentication
+        throw new Error('Usuário não cadastrado na plataforma. Por favor, entre em contato com o administrador.');
       }
-      return userCredential;
     } catch (error) {
+      // This will catch the custom error thrown above and any other sign-in errors
       throw error;
     }
   };
