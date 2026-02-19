@@ -1,4 +1,4 @@
-Animport { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { 
   signOut, 
   onAuthStateChanged,
@@ -9,8 +9,7 @@ import {
   doc, 
   getDoc, 
   updateDoc, 
-  serverTimestamp,
-  setDoc
+  serverTimestamp
 } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 
@@ -36,8 +35,6 @@ export const AuthProvider = ({ children }) => {
 
           if (data.blocked) {
             await signOut(auth);
-            // The user will be signed out, and this will trigger onAuthStateChanged again
-            // which will lead to a clean state.
             return;
           }
 
@@ -47,8 +44,6 @@ export const AuthProvider = ({ children }) => {
             console.warn('Não foi possível atualizar último acesso:', error);
           }
         } else {
-          // If user is authenticated in Firebase but not in our Firestore db,
-          // it's an unauthorized user. Sign them out.
           await signOut(auth);
         }
       } else {
@@ -81,12 +76,10 @@ export const AuthProvider = ({ children }) => {
         });
         return userCredential;
       } else {
-        // If the user document does not exist, they are not authorized.
-        await signOut(auth); // Sign them out from Firebase Authentication
+        await signOut(auth);
         throw new Error('Usuário não cadastrado na plataforma. Por favor, entre em contato com o administrador.');
       }
     } catch (error) {
-      // This will catch the custom error thrown above and any other sign-in errors
       throw error;
     }
   };
