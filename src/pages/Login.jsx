@@ -4,23 +4,19 @@ import { useAuth } from '../contexts/AuthContext';
 import styles from './Login.module.css';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { signInWithGoogle } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleGoogleSignIn = async () => {
     setError('');
     setLoading(true);
-
     try {
-      await login(email, password);
+      await signInWithGoogle();
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Erro ao fazer login. Verifique suas credenciais.');
+      setError(err.message || 'Erro ao fazer login com o Google.');
     } finally {
       setLoading(false);
     }
@@ -41,41 +37,17 @@ const Login = () => {
           <p>Uma plataforma, muitas raízes!</p>
         </div>
         
-        <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.form}>
           {error && <div className={styles.error}>{error}</div>}
-          
-          <div className={styles.inputGroup}>
-            <label htmlFor="email">E-mail</label>
-            <input
-              type="email"
-              id="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              placeholder="seu@email.com"
-            />
-          </div>
-
-          <div className={styles.inputGroup}>
-            <label htmlFor="password">Senha</label>
-            <input
-              type="password"
-              id="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-            />
-          </div>
 
           <button 
-            type="submit" 
+            onClick={handleGoogleSignIn}
             className={styles.submitButton}
             disabled={loading}
           >
-            {loading ? 'Entrando...' : 'Entrar'}
+            {loading ? 'Entrando...' : 'Entrar com Google'}
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );

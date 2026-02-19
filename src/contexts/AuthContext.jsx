@@ -1,20 +1,16 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { 
-  signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  updatePassword
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 import { 
   doc, 
   getDoc, 
   updateDoc, 
   serverTimestamp,
-  setDoc,
-  collection,
-  query,
-  where,
-  getDocs
+  setDoc
 } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 
@@ -86,48 +82,38 @@ export const AuthProvider = ({ children }) => {
     return unsubscribe;
   }, []);
 
-  const login = async (email, password) => {
+  const signInWithGoogle = async () => {
+    const provider = new GoogleAuthProvider();
     try {
-      // Fazer login primeiro
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
-      // Verificar se documento do usuário existe
-      const userDoc = await getDoc(doc(db, 'users', userCredential.user.uid));
-      
+      const userCredential = await signInWithPopup(auth, provider);
+      const user = userCredential.user;
+
+      // Check if user document exists
+      const userDocRef = doc(db, 'users', user.uid);
+      const userDoc = await getDoc(userDocRef);
+
       if (userDoc.exists()) {
         const userData = userDoc.data();
-        
-        // Verificar se usuário está bloqueado
         if (userData.blocked) {
           await signOut(auth);
           throw new Error('Sua conta foi bloqueada pelo administrador.');
         }
-        
-        // Atualizar último login
-        try {
-          await updateDoc(doc(db, 'users', userCredential.user.uid), {
-            lastLogin: serverTimestamp(),
-            sessionToken: Date.now().toString()
-          });
-        } catch (error) {
-          console.warn('Não foi possível atualizar último login:', error);
-        }
+        // Update last login
+        await updateDoc(userDocRef, {
+          lastLogin: serverTimestamp(),
+          sessionToken: Date.now().toString()
+        });
       } else {
-        // Criar documento básico se não existir
-        try {
-          await setDoc(doc(db, 'users', userCredential.user.uid), {
-            email: email,
-            isAdmin: false,
-            blocked: false,
-            createdAt: serverTimestamp(),
-            lastLogin: serverTimestamp(),
-            sessionToken: Date.now().toString()
-          });
-        } catch (error) {
-          console.warn('Não foi possível criar documento do usuário:', error);
-        }
+        // Create a new document if it doesn't exist
+        await setDoc(userDocRef, {
+          email: user.email,
+          isAdmin: false,
+          blocked: false,
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp(),
+          sessionToken: Date.now().toString()
+        });
       }
-
       return userCredential;
     } catch (error) {
       throw error;
@@ -141,7 +127,7 @@ export const AuthProvider = ({ children }) => {
   const value = {
     currentUser,
     userData,
-    login,
+    signInWithGoogle,
     logout,
     loading
   };
