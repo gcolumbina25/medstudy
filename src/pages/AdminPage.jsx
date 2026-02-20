@@ -1,35 +1,36 @@
 import { useState, useEffect } from 'react';
-import { 
-  collection, 
-  getDocs, 
-  addDoc, 
-  updateDoc, 
-  deleteDoc, 
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
   doc,
   query,
   orderBy,
   serverTimestamp,
-  setDoc
+  setDoc,
+  where
 } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, signOut, signInWithEmailAndPassword } from 'firebase/auth';
-import { db, auth } from '../config/firebase';
+import { db } from '../config/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
 import styles from './AdminPage.module.css';
 
 const AdminPage = () => {
   const { userData, currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('cycles'); // cycles, topics, lessons, users, library
+  const [activeTab, setActiveTab] = useState('cycles'); // cycles, topics, lessons, users, emails, library
   const [cycles, setCycles] = useState([]);
   const [topics, setTopics] = useState([]);
   const [users, setUsers] = useState([]);
+  const [allowedEmails, setAllowedEmails] = useState([]);
   const [libraryDocuments, setLibraryDocuments] = useState([]);
   const [loading, setLoading] = useState(true);
   
   // Form states
   const [showCycleForm, setShowCycleForm] = useState(false);
   const [showTopicForm, setShowTopicForm] = useState(false);
-  const [showUserForm, setShowUserForm] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
   const [showLibraryForm, setShowLibraryForm] = useState(false);
   const [editingLibraryId, setEditingLibraryId] = useState(null);
   const [selectedCycle, setSelectedCycle] = useState(null);
@@ -67,9 +68,8 @@ const AdminPage = () => {
     order: 0
   });
 
-  const [userForm, setUserForm] = useState({
+  const [emailForm, setEmailForm] = useState({
     email: '',
-    password: '',
     isAdmin: false
   });
 
@@ -116,6 +116,14 @@ const AdminPage = () => {
           usersData.push({ id: doc.id, ...doc.data() });
         });
         setUsers(usersData);
+      } else if (activeTab === 'emails') {
+        const emailsRef = collection(db, 'allowedEmails');
+        const snapshot = await getDocs(emailsRef);
+        const emailsData = [];
+        snapshot.forEach((doc) => {
+          emailsData.push({ id: doc.id, ...doc.data() });
+        });
+        setAllowedEmails(emailsData);
       } else if (activeTab === 'library') {
         const libraryRef = collection(db, 'library');
         const q = query(libraryRef, orderBy('name', 'asc'));
@@ -414,56 +422,55 @@ const AdminPage = () => {
     }
   };
 
-  const handleCreateUser = async (e) => {
+  const handleCreateEmail = async (e) => {
     e.preventDefault();
     
     try {
-      // Criar o usuário no Firebase Auth (isso fará login automático com o novo usuário)
-      const userCredential = await createUserWithEmailAndPassword(
-        auth,
-        userForm.email,
-        userForm.password
-      );
+      // Verificar se o e-mail já existe
+      const emailsRef = collection(db, 'allowedEmails');
+      const q = query(emailsRef, where('email', '==', emailForm.email));
+      const snapshot = await getDocs(q);
+      
+      if (!snapshot.empty) {
+        alert('Este e-mail já está na lista de permitidos.');
+        return;
+      }
 
-      // Criar o documento do usuário no Firestore usando setDoc (não updateDoc)
-      await setDoc(doc(db, 'users', userCredential.user.uid), {
-        email: userForm.email,
-        isAdmin: userForm.isAdmin,
-        blocked: false,
-        createdAt: serverTimestamp()
+      // Adicionar o e-mail à lista de permitidos
+      await addDoc(collection(db, 'allowedEmails'), {
+        email: emailForm.email,
+        isAdmin: emailForm.isAdmin,
+        addedBy: currentUser.uid,
+        addedAt: serverTimestamp()
       });
 
       // Limpar o formulário
-      setUserForm({ email: '', password: '', isAdmin: false });
-      setShowUserForm(false);
+      setEmailForm({ email: '', isAdmin: false });
+      setShowEmailForm(false);
       
-      // Fazer logout do novo usuário criado (para não ficar logado como ele)
-      await signOut(auth);
-      
-      // Atualizar a lista de usuários
+      // Atualizar a lista
       fetchData();
       
-      // Informar ao admin sobre o logout necessário
-      alert('Usuário criado com sucesso!\n\nNota: Você foi desconectado porque o Firebase faz login automático ao criar um usuário.\nPor favor, faça login novamente com sua conta de administrador.');
-      
-      // Redirecionar para login após um pequeno delay
-      setTimeout(() => {
-        window.location.href = '/login';
-      }, 2000);
+      alert('E-mail adicionado com sucesso à lista de permitidos!');
       
     } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      
-      // Tratamento de erros específicos
-      if (error.code === 'auth/email-already-in-use') {
-        alert('Este e-mail já está em uso. Use a opção de edição se quiser modificar o usuário.');
-      } else if (error.code === 'auth/weak-password') {
-        alert('A senha é muito fraca. Use pelo menos 6 caracteres.');
-      } else if (error.code === 'auth/invalid-email') {
-        alert('O e-mail fornecido não é válido.');
-      } else {
-        alert('Erro ao criar usuário: ' + error.message);
-      }
+      console.error('Erro ao adicionar e-mail:', error);
+      alert('Erro ao adicionar e-mail: ' + error.message);
+    }
+  };
+
+  const handleDeleteEmail = async (emailId) => {
+    if (!confirm('Tem certeza que deseja remover este e-mail da lista de permitidos?')) {
+      return;
+    }
+    
+    try {
+      await deleteDoc(doc(db, 'allowedEmails', emailId));
+      fetchData();
+      alert('E-mail removido com sucesso!');
+    } catch (error) {
+      console.error('Erro ao remover e-mail:', error);
+      alert('Erro ao remover e-mail');
     }
   };
 
@@ -773,6 +780,12 @@ const AdminPage = () => {
             onClick={() => setActiveTab('library')}
           >
             Biblioteca
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'emails' ? styles.active : ''}`}
+            onClick={() => setActiveTab('emails')}
+          >
+            E-mails Permitidos
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'users' ? styles.active : ''}`}
@@ -1321,49 +1334,143 @@ Fisiologia Humana | Fisiologia | CODIGO_DO_DRIVE | https://...`}
           </div>
         )}
 
-        {activeTab === 'users' && (
+        {activeTab === 'emails' && (
           <div className={styles.content}>
             <div className={styles.header}>
-              <h2>Usuários</h2>
+              <h2>E-mails Permitidos</h2>
               <button
                 className={styles.addButton}
-                onClick={() => setShowUserForm(!showUserForm)}
+                onClick={() => setShowEmailForm(!showEmailForm)}
               >
-                + Novo Usuário
+                + Adicionar E-mail
               </button>
             </div>
 
-            {showUserForm && (
-              <form onSubmit={handleCreateUser} className={styles.form}>
+            {showEmailForm && (
+              <form onSubmit={handleCreateEmail} className={styles.form}>
                 <input
                   type="email"
                   placeholder="E-mail"
-                  value={userForm.email}
-                  onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+                  value={emailForm.email}
+                  onChange={(e) => setEmailForm({ ...emailForm, email: e.target.value })}
                   required
-                />
-                <input
-                  type="password"
-                  placeholder="Senha"
-                  value={userForm.password}
-                  onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-                  required
-                  minLength={6}
                 />
                 <label className={styles.checkboxLabel}>
                   <input
                     type="checkbox"
-                    checked={userForm.isAdmin}
-                    onChange={(e) => setUserForm({ ...userForm, isAdmin: e.target.checked })}
+                    checked={emailForm.isAdmin}
+                    onChange={(e) => setEmailForm({ ...emailForm, isAdmin: e.target.checked })}
                   />
                   Administrador
                 </label>
                 <div className={styles.formActions}>
-                  <button type="submit">Criar</button>
-                  <button type="button" onClick={() => setShowUserForm(false)}>Cancelar</button>
+                  <button type="submit">Adicionar</button>
+                  <button type="button" onClick={() => setShowEmailForm(false)}>Cancelar</button>
                 </div>
               </form>
             )}
+
+            <div className={styles.list}>
+              {allowedEmails.map((emailDoc) => (
+                <div key={emailDoc.id} className={styles.item}>
+                  <div className={styles.itemContent}>
+                    <h3>{emailDoc.email}</h3>
+                    <p>
+                      {emailDoc.isAdmin && <span className={styles.badge}>Admin</span>}
+                      {emailDoc.addedAt && (
+                        <span className={styles.lastAccess}>
+                          Adicionado em: {emailDoc.addedAt.toDate?.().toLocaleString('pt-BR') || 'Data desconhecida'}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  <div className={styles.itemActions}>
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => handleDeleteEmail(emailDoc.id)}
+                    >
+                      Remover
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'emails' && (
+          <div className={styles.content}>
+            <div className={styles.header}>
+              <h2>E-mails Permitidos</h2>
+              <button
+                className={styles.addButton}
+                onClick={() => setShowEmailForm(!showEmailForm)}
+              >
+                + Adicionar E-mail
+              </button>
+            </div>
+
+            {showEmailForm && (
+              <form onSubmit={handleCreateEmail} className={styles.form}>
+                <input
+                  type="email"
+                  placeholder="E-mail"
+                  value={emailForm.email}
+                  onChange={(e) => setEmailForm({ ...emailForm, email: e.target.value })}
+                  required
+                />
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={emailForm.isAdmin}
+                    onChange={(e) => setEmailForm({ ...emailForm, isAdmin: e.target.checked })}
+                  />
+                  Administrador
+                </label>
+                <div className={styles.formActions}>
+                  <button type="submit">Adicionar</button>
+                  <button type="button" onClick={() => setShowEmailForm(false)}>Cancelar</button>
+                </div>
+              </form>
+            )}
+
+            <div className={styles.list}>
+              {allowedEmails.map((emailDoc) => (
+                <div key={emailDoc.id} className={styles.item}>
+                  <div className={styles.itemContent}>
+                    <h3>{emailDoc.email}</h3>
+                    <p>
+                      {emailDoc.isAdmin && <span className={styles.badge}>Admin</span>}
+                      {emailDoc.addedAt && (
+                        <span className={styles.lastAccess}>
+                          Adicionado em: {emailDoc.addedAt.toDate?.().toLocaleString('pt-BR') || 'Data desconhecida'}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                  <div className={styles.itemActions}>
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => handleDeleteEmail(emailDoc.id)}
+                    >
+                      Remover
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'users' && (
+          <div className={styles.content}>
+            <div className={styles.header}>
+              <h2>Usuários Cadastrados</h2>
+              <p className={styles.infoText}>
+                Os usuários são criados automaticamente quando fazem login com Google.<br/>
+                Use a aba "E-mails Permitidos" para controlar quem pode acessar o sistema.
+              </p>
+            </div>
 
             <div className={styles.list}>
               {users.map((user) => (
@@ -1373,9 +1480,9 @@ Fisiologia Humana | Fisiologia | CODIGO_DO_DRIVE | https://...`}
                     <p>
                       {user.isAdmin && <span className={styles.badge}>Admin</span>}
                       {user.blocked && <span className={styles.badgeBlocked}>Bloqueado</span>}
-                      {user.lastAccess && (
+                      {user.lastLogin && (
                         <span className={styles.lastAccess}>
-                          Último acesso: {user.lastAccess.toDate?.().toLocaleString('pt-BR') || 'Nunca'}
+                          Último login: {user.lastLogin.toDate?.().toLocaleString('pt-BR') || 'Nunca'}
                         </span>
                       )}
                     </p>

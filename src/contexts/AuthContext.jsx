@@ -76,8 +76,26 @@ export const AuthProvider = ({ children }) => {
         });
         return userCredential;
       } else {
-        await signOut(auth);
-        throw new Error('Usuário não cadastrado na plataforma. Por favor, entre em contato com o administrador.');
+        // Verificar se o e-mail está na lista de permitidos
+        const allowedEmailsRef = collection(db, 'allowedEmails');
+        const q = query(allowedEmailsRef, where('email', '==', user.email));
+        const allowedSnapshot = await getDocs(q);
+
+        if (!allowedSnapshot.empty) {
+          // E-mail está permitido, criar documento do usuário
+          const emailData = allowedSnapshot.docs[0].data();
+          await setDoc(userDocRef, {
+            email: user.email,
+            isAdmin: emailData.isAdmin || false,
+            blocked: false,
+            createdAt: serverTimestamp(),
+            lastLogin: serverTimestamp()
+          });
+          return userCredential;
+        } else {
+          await signOut(auth);
+          throw new Error('Usuário não cadastrado na plataforma. Por favor, entre em contato com o administrador.');
+        }
       }
     } catch (error) {
       throw error;
