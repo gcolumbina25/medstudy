@@ -1,12 +1,18 @@
 .card {
-  background-color: #fff;
+  background-color: var(--bg-card);
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 8px var(--shadow-purple);
   padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 15px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-color);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+  border-color: var(--border-hover);
+  box-shadow: 0 4px 12px var(--shadow-purple-strong);
 }
 
 .cardHeader {
@@ -29,26 +35,27 @@
 .title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .openButton {
-  background-color: #f3f4f6;
-  color: #374151;
-  border: 1px solid #d1d5db;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
   padding: 8px 16px;
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
   font-size: 0.9rem;
-  transition: background-color 0.2s, box-shadow 0.2s;
+  transition: background-color 0.2s, box-shadow 0.2s, border-color 0.2s;
   white-space: nowrap;
 }
 
 .openButton:hover {
-  background-color: #e5e7eb;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  background-color: var(--bg-secondary);
+  border-color: var(--border-hover);
+  box-shadow: 0 1px 3px var(--shadow-purple);
 }
 
 .cardBody {
@@ -57,7 +64,7 @@
 
 .description {
   font-size: 1rem;
-  color: #4b5563;
+  color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
 }
@@ -67,13 +74,14 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 15px;
-  border-top: 1px solid #f3f4f6;
+  border-top: 1px solid var(--border-color);
   font-size: 0.85rem;
-  color: #6b7280;
+  color: var(--text-tertiary);
 }
 
 .author {
   font-weight: 500;
+  color: var(--text-secondary);
 }
 
 .actions {
@@ -90,22 +98,23 @@
   border: none;
   cursor: pointer;
   font-size: 1.1rem;
-  color: #6b7280;
+  color: var(--text-tertiary);
   padding: 6px;
   border-radius: 50%;
-  transition: background-color 0.2s, transform 0.2s;
+  transition: background-color 0.2s, transform 0.2s, color 0.2s;
 }
 
 .likeButton:hover {
-  background-color: #fce8e8;
+  background-color: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
 .likeButton.liked {
-  color: #ef4444;
+  color: var(--accent-secondary);
 }
 
 .likeButton.liked:hover {
-    background-color: #fbd3d3;
+    background-color: rgba(236, 72, 153, 0.1);
 }
 
 .likeButton:disabled {
