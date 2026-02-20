@@ -53,8 +53,9 @@ export const AuthProvider = ({ children }) => {
             console.warn('⚠️ Could not update last access:', error);
           }
         } else {
-          console.log('❌ User document not found, signing out');
-          await signOut(auth);
+          console.log('⚠️ User document not found - signInWithGoogle should handle this');
+          // Não fazer signOut aqui - deixar o signInWithGoogle decidir
+          setUserData(null);
         }
       } else {
         console.log('🚪 No user, clearing state');
@@ -116,8 +117,9 @@ export const AuthProvider = ({ children }) => {
           await setDoc(userDocRef, newUserData);
           console.log('✅ Novo usuário criado:', newUserData);
 
-          // Atualizar o estado local com os dados do novo usuário
+          // Atualizar o estado local com os dados do novo usuário IMEDIATAMENTE
           setUserData(newUserData);
+          console.log('✅ Estado local atualizado com novo usuário');
 
           return userCredential;
         } else {
