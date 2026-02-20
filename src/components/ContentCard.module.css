@@ -22,6 +22,12 @@
   gap: 15px;
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .titleContainer {
   display: flex;
   align-items: center;
@@ -56,6 +62,32 @@
   background-color: var(--bg-secondary);
   border-color: var(--border-hover);
   box-shadow: 0 1px 3px var(--shadow-purple);
+}
+
+.deleteButton {
+  background-color: transparent;
+  color: var(--text-tertiary);
+  border: 1px solid transparent;
+  padding: 8px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 1rem;
+  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteButton:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.deleteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .cardBody {
