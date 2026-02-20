@@ -10,54 +10,99 @@ import styles from './Dashboard.module.css';
 const Dashboard = () => {
   const [cyclesWithTopics, setCyclesWithTopics] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { currentUser } = useAuth();
+  const { currentUser, userData, loading: authLoading } = useAuth();
 
   useEffect(() => {
-    const fetchCyclesAndTopics = async () => {
-      try {
-        // Buscar todos os ciclos
-        const cyclesRef = collection(db, 'cycles');
-        const cyclesQuery = query(cyclesRef, orderBy('order', 'asc'));
-        const cyclesSnapshot = await getDocs(cyclesQuery);
-        
-        const cyclesData = [];
-        
-        // Para cada ciclo, buscar seus tópicos
-        for (const cycleDoc of cyclesSnapshot.docs) {
-          const cycleData = { id: cycleDoc.id, ...cycleDoc.data() };
-          
-          // Buscar tópicos do ciclo
-          const topicsRef = collection(db, 'cycles', cycleDoc.id, 'topics');
-          const topicsQuery = query(topicsRef, orderBy('order', 'asc'));
-          const topicsSnapshot = await getDocs(topicsQuery);
-          
-          const topicsData = [];
-          topicsSnapshot.forEach((topicDoc) => {
-            topicsData.push({ id: topicDoc.id, ...topicDoc.data() });
-          });
-          
-          cyclesData.push({
-            ...cycleData,
-            topics: topicsData
-          });
-        }
-        
-        setCyclesWithTopics(cyclesData);
-      } catch (error) {
-        console.error('Erro ao carregar ciclos e tópicos:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    // Só buscar dados se o usuário estiver completamente carregado
+    if (!authLoading && currentUser && userData) {
+      fetchCyclesAndTopics();
+    }
+  }, [currentUser, userData, authLoading]);
 
-    fetchCyclesAndTopics();
-  }, []);
+  const fetchCyclesAndTopics = async () => {
+    try {
+      // Buscar todos os ciclos
+      const cyclesRef = collection(db, 'cycles');
+      const cyclesQuery = query(cyclesRef, orderBy('order', 'asc'));
+      const cyclesSnapshot = await getDocs(cyclesQuery);
+      
+      const cyclesData = [];
+      
+      // Para cada ciclo, buscar seus tópicos
+      for (const cycleDoc of cyclesSnapshot.docs) {
+        const cycleData = { id: cycleDoc.id, ...cycleDoc.data() };
+        
+        // Buscar tópicos do ciclo
+        const topicsRef = collection(db, 'cycles', cycleDoc.id, 'topics');
+        const topicsQuery = query(topicsRef, orderBy('order', 'asc'));
+        const topicsSnapshot = await getDocs(topicsQuery);
+        
+        const topicsData = [];
+        topicsSnapshot.forEach((topicDoc) => {
+          topicsData.push({ id: topicDoc.id, ...topicDoc.data() });
+        });
+        
+        cyclesData.push({
+          ...cycleData,
+          topics: topicsData
+        });
+      }
+      
+      setCyclesWithTopics(cyclesData);
+    } catch (error) {
+      console.error('Erro ao carregar ciclos e tópicos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
       <div className={styles.loading}>
         <div className={styles.spinner}></div>
         <p>Carregando conteúdo...</p>
+      </div>
+    );
+  }
+
+  if (authLoading || !currentUser || !userData) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column',
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '100vh',
+        background: 'linear-gradient(135deg, #0a0815 0%, #141028 50%, #1a1533 100%)',
+        gap: '20px'
+      }}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '16px'
+        }}>
+          <img 
+            src="https://i.ibb.co/sdNZm3Vg/Pavao.png" 
+            alt="MedStudy Logo" 
+            style={{
+              width: '60px',
+              height: '60px',
+              objectFit: 'contain'
+            }}
+          />
+          <h2 style={{
+            fontFamily: "'Stack Sans Notch', sans-serif",
+            fontSize: '2rem',
+            fontWeight: 700,
+            color: '#ffffff',
+            margin: 0
+          }}>
+            MedStudy
+          </h2>
+        </div>
+        <p style={{ color: '#00ff88', fontSize: '1.1rem' }}>
+          Carregando sua experiência de estudo...
+        </p>
       </div>
     );
   }

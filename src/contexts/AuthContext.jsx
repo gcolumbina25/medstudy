@@ -84,13 +84,19 @@ export const AuthProvider = ({ children }) => {
         if (!allowedSnapshot.empty) {
           // E-mail está permitido, criar documento do usuário
           const emailData = allowedSnapshot.docs[0].data();
-          await setDoc(userDocRef, {
+          const newUserData = {
             email: user.email,
             isAdmin: emailData.isAdmin || false,
             blocked: false,
             createdAt: serverTimestamp(),
             lastLogin: serverTimestamp()
-          });
+          };
+          
+          await setDoc(userDocRef, newUserData);
+          
+          // Atualizar o estado local com os dados do novo usuário
+          setUserData(newUserData);
+          
           return userCredential;
         } else {
           await signOut(auth);
