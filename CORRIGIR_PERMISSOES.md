@@ -81,10 +81,11 @@ service cloud.firestore {
                        request.auth.uid == resource.data.author.uid;
     }
     
-    // Regras para e-mails permitidos (apenas admins)
+    // Regras para e-mails permitidos
+    // Qualquer usuário autenticado pode ler (para verificar se pode fazer login)
+    // Apenas admins podem escrever/criar/excluir
     match /allowedEmails/{emailId} {
-      allow read: if request.auth != null && 
-                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      allow read: if request.auth != null;
       allow write: if request.auth != null && 
                        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
       allow create: if request.auth != null && 

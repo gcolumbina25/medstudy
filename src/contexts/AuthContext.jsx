@@ -77,11 +77,15 @@ export const AuthProvider = ({ children }) => {
         return userCredential;
       } else {
         // Verificar se o e-mail está na lista de permitidos
+        console.log('Verificando e-mail permitido para:', user.email);
         const allowedEmailsRef = collection(db, 'allowedEmails');
         const q = query(allowedEmailsRef, where('email', '==', user.email));
         const allowedSnapshot = await getDocs(q);
-
+        
+        console.log('Resultado da query allowedEmails:', allowedSnapshot.size, 'documentos encontrados');
+        
         if (!allowedSnapshot.empty) {
+          console.log('E-mail encontrado na lista de permitidos, criando usuário...');
           // E-mail está permitido, criar documento do usuário
           const emailData = allowedSnapshot.docs[0].data();
           const newUserData = {
@@ -93,12 +97,14 @@ export const AuthProvider = ({ children }) => {
           };
           
           await setDoc(userDocRef, newUserData);
+          console.log('Documento do usuário criado com sucesso');
           
           // Atualizar o estado local com os dados do novo usuário
           setUserData(newUserData);
           
           return userCredential;
         } else {
+          console.log('E-mail NÃO encontrado na lista de permitidos');
           await signOut(auth);
           throw new Error('Usuário não cadastrado na plataforma. Por favor, entre em contato com o administrador.');
         }

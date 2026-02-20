@@ -426,16 +426,22 @@ const AdminPage = () => {
     e.preventDefault();
     
     try {
+      console.log('Tentando adicionar e-mail:', emailForm.email);
+      
       // Verificar se o e-mail já existe
       const emailsRef = collection(db, 'allowedEmails');
       const q = query(emailsRef, where('email', '==', emailForm.email));
       const snapshot = await getDocs(q);
+      
+      console.log('Verificação de e-mail existente:', snapshot.size, 'documentos encontrados');
       
       if (!snapshot.empty) {
         alert('Este e-mail já está na lista de permitidos.');
         return;
       }
 
+      console.log('Adicionando e-mail à coleção allowedEmails...');
+      
       // Adicionar o e-mail à lista de permitidos
       await addDoc(collection(db, 'allowedEmails'), {
         email: emailForm.email,
@@ -443,6 +449,8 @@ const AdminPage = () => {
         addedBy: currentUser.uid,
         addedAt: serverTimestamp()
       });
+
+      console.log('E-mail adicionado com sucesso!');
 
       // Limpar o formulário
       setEmailForm({ email: '', isAdmin: false });
