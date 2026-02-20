@@ -1,11 +1,13 @@
 // Script de teste para verificar allowedEmails
-// Execute no console do navegador quando logado como admin
+// Execute no console do navegador QUANDO LOGADO na aplicação
 
 async function testAllowedEmails() {
   try {
     console.log('🔍 Testando leitura da coleção allowedEmails...');
 
-    const db = firebase.firestore();
+    // Usar a instância do Firebase da aplicação (não o SDK global)
+    // Isso assume que a aplicação já carregou o Firebase
+    const db = window.firebase?.firestore?.() || firebase.firestore();
     const allowedEmailsRef = db.collection('allowedEmails');
     const snapshot = await allowedEmailsRef.get();
 
@@ -36,7 +38,11 @@ async function testAllowedEmails() {
 
   } catch (error) {
     console.error('❌ Erro no teste:', error);
+    console.log('💡 Dica: Certifique-se de estar logado na aplicação e que as regras do Firestore foram publicadas');
   }
 }
 
-testAllowedEmails();
+// Para usar na aplicação, você pode colar isso no console:
+// testAllowedEmails();
+
+export { testAllowedEmails };

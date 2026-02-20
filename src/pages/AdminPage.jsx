@@ -15,11 +15,12 @@ import {
 import { db } from '../config/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
+import TestAllowedEmails from '../components/TestAllowedEmails';
 import styles from './AdminPage.module.css';
 
 const AdminPage = () => {
   const { userData, currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('cycles'); // cycles, topics, lessons, users, emails, library
+  const [activeTab, setActiveTab] = useState('cycles'); // cycles, topics, lessons, users, emails, library, tests
   const [cycles, setCycles] = useState([]);
   const [topics, setTopics] = useState([]);
   const [users, setUsers] = useState([]);
@@ -426,22 +427,16 @@ const AdminPage = () => {
     e.preventDefault();
     
     try {
-      console.log('Tentando adicionar e-mail:', emailForm.email);
-      
       // Verificar se o e-mail já existe
       const emailsRef = collection(db, 'allowedEmails');
       const q = query(emailsRef, where('email', '==', emailForm.email));
       const snapshot = await getDocs(q);
-      
-      console.log('Verificação de e-mail existente:', snapshot.size, 'documentos encontrados');
       
       if (!snapshot.empty) {
         alert('Este e-mail já está na lista de permitidos.');
         return;
       }
 
-      console.log('Adicionando e-mail à coleção allowedEmails...');
-      
       // Adicionar o e-mail à lista de permitidos
       await addDoc(collection(db, 'allowedEmails'), {
         email: emailForm.email,
@@ -449,8 +444,6 @@ const AdminPage = () => {
         addedBy: currentUser.uid,
         addedAt: serverTimestamp()
       });
-
-      console.log('E-mail adicionado com sucesso!');
 
       // Limpar o formulário
       setEmailForm({ email: '', isAdmin: false });
@@ -800,6 +793,12 @@ const AdminPage = () => {
             onClick={() => setActiveTab('users')}
           >
             Usuários
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'tests' ? styles.active : ''}`}
+            onClick={() => setActiveTab('tests')}
+          >
+            Testes
           </button>
         </div>
 
@@ -1442,6 +1441,17 @@ Fisiologia Humana | Fisiologia | CODIGO_DO_DRIVE | https://...`}
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {activeTab === 'tests' && (
+          <div className={styles.content}>
+            <div className={styles.header}>
+              <h2>Testes e Diagnóstico</h2>
+              <p>Use esta aba para testar a funcionalidade do sistema de e-mails permitidos</p>
+            </div>
+
+            <TestAllowedEmails />
           </div>
         )}
       </main>
