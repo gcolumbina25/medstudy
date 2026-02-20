@@ -8,8 +8,13 @@ import {
 import { 
   doc, 
   getDoc, 
-  updateDoc, 
-  serverTimestamp
+  updateDoc,
+  serverTimestamp,
+  collection,
+  query,
+  where,
+  getDocs,
+  setDoc
 } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 
