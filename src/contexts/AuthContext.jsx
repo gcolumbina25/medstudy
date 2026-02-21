@@ -105,42 +105,12 @@ export const AuthProvider = ({ children }) => {
         return userCredential;
       } else {
         console.log('🆕 Usuário novo, verificando lista de emails permitidos...');
-        console.log('👤 E-mail do usuário autenticado:', user.email);
-        
-        try {
-          // Verificar se o e-mail está na lista de permitidos
-          const allowedEmailsRef = collection(db, 'allowedEmails');
-          const q = query(allowedEmailsRef, where('email', '==', user.email));
-          console.log('🔍 Executando query na coleção allowedEmails...');
-          const allowedSnapshot = await getDocs(q);
+        // Verificar se o e-mail está na lista de permitidos
+        const allowedEmailsRef = collection(db, 'allowedEmails');
+        const q = query(allowedEmailsRef, where('email', '==', user.email));
+        const allowedSnapshot = await getDocs(q);
 
-          console.log('📧 Query concluída - encontrados:', allowedSnapshot.size, 'documentos');
-
-          if (!allowedSnapshot.empty) {
-            console.log('✅ E-mail encontrado na lista permitida!');
-            const emailData = allowedSnapshot.docs[0].data();
-            console.log('📄 Dados do e-mail:', emailData);
-              isAdmin: data.isAdmin,
-              emailMatch: data.email === user.email,
-              emailLowerMatch: data.email?.toLowerCase() === user.email?.toLowerCase()
-            });
-          });
-        } else {
-          console.log('❌ Nenhum documento encontrado na coleção allowedEmails');
-          
-          // Tentar buscar todos os e-mails para debug
-          console.log('🔍 Buscando todos os e-mails permitidos para comparação...');
-          try {
-            const allEmailsSnapshot = await getDocs(allowedEmailsRef);
-            console.log('📧 Total de e-mails na coleção:', allEmailsSnapshot.size);
-            allEmailsSnapshot.forEach((doc) => {
-              const data = doc.data();
-              console.log('   -', data.email, '(ID:', doc.id + ')');
-            });
-          } catch (debugError) {
-            console.error('❌ Erro ao buscar todos os e-mails:', debugError);
-          }
-        }
+        console.log('📧 Verificação de email - encontrados:', allowedSnapshot.size);
 
         if (!allowedSnapshot.empty) {
           console.log('✅ Email encontrado na lista permitida');
@@ -166,16 +136,19 @@ export const AuthProvider = ({ children }) => {
           console.log('❌ Email não encontrado na lista permitida');
           
           // REGISTRAR TENTATIVA NÃO AUTORIZADA
-          console.log('📝 Registrando tentativa não autorizada para:', user.email);
+          console.log('📝 Registrando tentativa não autorizada...');
           try {
             await addDoc(collection(db, 'unauthorizedAttempts'), {
               email: user.email,
-              attemptedAt: new Date()
+              uid: user.uid,
+              displayName: user.displayName,
+              attemptedAt: serverTimestamp(),
+              ipAddress: null, // Pode ser capturado no backend se necessário
+              userAgent: navigator.userAgent
             });
-            console.log('✅ Tentativa não autorizada registrada com sucesso');
+            console.log('✅ Tentativa não autorizada registrada');
           } catch (logError) {
-            console.error('❌ Erro ao registrar tentativa não autorizada:', logError);
-            console.error('Detalhes do erro:', logError.code, logError.message);
+            console.warn('⚠️ Não foi possível registrar tentativa:', logError);
           }
           
           // DESCONECTAR IMEDIATAMENTE por segurança

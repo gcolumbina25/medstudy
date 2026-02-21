@@ -15,6 +15,7 @@ import {
 import { db } from '../config/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
+import TestAllowedEmails from '../components/TestAllowedEmails';
 import UnauthorizedAttempts from '../components/UnauthorizedAttempts';
 import styles from './AdminPage.module.css';
 
@@ -798,7 +799,7 @@ const AdminPage = () => {
             className={`${styles.tab} ${activeTab === 'tests' ? styles.active : ''}`}
             onClick={() => setActiveTab('tests')}
           >
-            Segurança
+            Testes
           </button>
         </div>
 
@@ -1447,8 +1448,8 @@ Fisiologia Humana | Fisiologia | CODIGO_DO_DRIVE | https://...`}
         {activeTab === 'tests' && (
           <div className={styles.content}>
             <div className={styles.header}>
-              <h2>Monitoramento de Segurança</h2>
-              <p>Visualize tentativas de acesso não autorizado ao sistema</p>
+              <h2>Testes e Diagnóstico</h2>
+              <p>Use esta aba para testar a funcionalidade do sistema de e-mails permitidos</p>
             </div>
 
             <TestAllowedEmails />

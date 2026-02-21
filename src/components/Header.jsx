@@ -1,25 +1,20 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useState } from 'react';
 import styles from './Header.module.css';
 
 const Header = () => {
   const { currentUser, userData, logout } = useAuth();
   const navigate = useNavigate();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     navigate('/login');
-    setIsMenuOpen(false);
   };
-
-  const closeMenu = () => setIsMenuOpen(false);
 
   return (
     <header className={styles.header}>
       <div className={styles.container}>
-        <Link to="/" className={styles.logo} onClick={closeMenu}>
+        <Link to="/" className={styles.logo}>
           <img 
             src="https://i.ibb.co/sdNZm3Vg/Pavao.png" 
             alt="MedStudy Logo" 
@@ -28,23 +23,13 @@ const Header = () => {
           <h2>MedStudy</h2>
         </Link>
 
-        <button 
-          className={styles.hamburger} 
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          <span></span>
-          <span></span>
-          <span></span>
-        </button>
-
-        <nav className={`${styles.nav} ${isMenuOpen ? styles.navOpen : ''}`}>
-          <Link to="/" className={styles.navLink} onClick={closeMenu}>Início</Link>
-          <Link to="/revisao" className={styles.navLink} onClick={closeMenu}>Revisão</Link>
-          <Link to="/biblioteca" className={styles.navLink} onClick={closeMenu}>Biblioteca</Link>
-          <Link to="/comunidade" className={styles.navLink} onClick={closeMenu}>Comunidade</Link>
+        <nav className={styles.nav}>
+          <Link to="/" className={styles.navLink}>Início</Link>
+          <Link to="/revisao" className={styles.navLink}>Revisão</Link>
+          <Link to="/biblioteca" className={styles.navLink}>Biblioteca</Link>
+          <Link to="/comunidade" className={styles.navLink}>Comunidade</Link> {/* Novo link */}
           {userData?.isAdmin && (
-            <Link to="/admin" className={styles.navLink} onClick={closeMenu}>Admin</Link>
+            <Link to="/admin" className={styles.navLink}>Admin</Link>
           )}
         </nav>
 
