@@ -16,7 +16,6 @@ import { db } from '../config/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
 import TestAllowedEmails from '../components/TestAllowedEmails';
-import UnauthorizedAttempts from '../components/UnauthorizedAttempts';
 import styles from './AdminPage.module.css';
 
 const AdminPage = () => {
@@ -1453,7 +1452,6 @@ Fisiologia Humana | Fisiologia | CODIGO_DO_DRIVE | https://...`}
             </div>
 
             <TestAllowedEmails />
-            <UnauthorizedAttempts />
           </div>
         )}
       </main>

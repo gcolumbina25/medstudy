@@ -10,15 +10,5 @@ service cloud.firestore {
       allow update: if request.auth != null;
       allow delete: if request.auth != null;
     }
-
-    // Regras específicas para tentativas não autorizadas
-    // Apenas admins podem visualizar, sistema pode registrar
-    match /unauthorizedAttempts/{attemptId} {
-      allow read: if request.auth != null &&
-                      (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
-                       get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
-      allow write: if true; // Sistema pode registrar tentativas
-      allow create: if true; // Sistema pode criar registros
-    }
   }
 }

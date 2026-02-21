@@ -10,28 +10,14 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleGoogleSignIn = async () => {
-    console.log('🎯 Botão de login clicado');
     setError('');
     setLoading(true);
     try {
-      console.log('🔐 Iniciando tentativa de login...');
       await signInWithGoogle();
-      console.log('✅ Login bem-sucedido, redirecionando...');
       navigate('/');
     } catch (err) {
-      console.error('❌ ERRO CAPTURADO NO LOGIN COMPONENT:', err);
-      console.error('❌ Mensagem do erro:', err.message);
-      console.error('❌ Stack do erro:', err.stack);
-      
-      const errorMessage = err.message || 'Erro ao fazer login com o Google.';
-      console.log('📝 Definindo mensagem de erro:', errorMessage);
-      setError(errorMessage);
-      
-      // Forçar popup independente da mensagem
-      console.log('🚨 Mostrando popup de erro...');
-      window.alert(`🚫 ACESSO NEGADO - SEGURANÇA ATIVA\n\n${errorMessage}\n\n📧 Entre em contato com o administrador para solicitar credenciais de acesso.`);
+      setError(err.message || 'Erro ao fazer login com o Google.');
     } finally {
-      console.log('🏁 Finalizando tentativa de login');
       setLoading(false);
     }
   };
@@ -52,26 +38,7 @@ const Login = () => {
         </div>
         
         <div className={styles.form}>
-          {error && (
-            <div className={`${styles.error} ${error.includes('não cadastrado') || error.includes('não encontrado') ? styles.securityError : ''}`}>
-              <div className={styles.errorIcon}>
-                {error.includes('não cadastrado') || error.includes('não encontrado') ? '🚫' : '❌'}
-              </div>
-              <div className={styles.errorContent}>
-                <strong>
-                  {error.includes('não cadastrado') || error.includes('não encontrado') 
-                    ? 'ACESSO NEGADO - SEGURANÇA ATIVA' 
-                    : 'ERRO NO LOGIN'}
-                </strong>
-                <p>{error}</p>
-                {(error.includes('não cadastrado') || error.includes('não encontrado')) && (
-                  <p className={styles.securityNote}>
-                    <small>📧 Entre em contato com o administrador para solicitar credenciais de acesso.</small>
-                  </p>
-                )}
-              </div>
-            </div>
-          )}
+          {error && <div className={styles.error}>{error}</div>}
 
           <button 
             onClick={handleGoogleSignIn}

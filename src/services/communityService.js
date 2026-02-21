@@ -1,4 +1,4 @@
-import { collection, addDoc, serverTimestamp, query, onSnapshot, orderBy, doc, runTransaction, deleteDoc } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, query, onSnapshot, orderBy, doc, runTransaction } from 'firebase/firestore';
 import { db } from '../config/firebase';
 
 const contentCollection = collection(db, 'community_content');
@@ -93,35 +93,5 @@ export const toggleLike = async (contentId, userId) => {
   } catch (error) {
     console.error("Erro ao processar o like:", error);
     throw new Error("Não foi possível processar o like.");
-  }
-};
-
-/**
- * Deleta um conteúdo da comunidade.
- * @param {string} contentId - O ID do conteúdo a ser deletado.
- * @param {object} currentUser - O usuário atual.
- * @param {object} contentAuthor - O autor do conteúdo.
- * @returns {Promise<void>}
- */
-export const deleteContent = async (contentId, currentUser, contentAuthor) => {
-  if (!currentUser) {
-    throw new Error('Usuário não autenticado.');
-  }
-
-  // Verificar se o usuário é o autor ou um admin
-  const isAuthor = currentUser.uid === contentAuthor.uid;
-  const isAdmin = currentUser.userData?.isAdmin === true;
-
-  if (!isAuthor && !isAdmin) {
-    throw new Error('Você não tem permissão para deletar este conteúdo.');
-  }
-
-  try {
-    const contentRef = doc(db, 'community_content', contentId);
-    await deleteDoc(contentRef);
-    console.log('Conteúdo deletado com sucesso:', contentId);
-  } catch (error) {
-    console.error("Erro ao deletar conteúdo:", error);
-    throw new Error('Não foi possível deletar o conteúdo.');
   }
 };
