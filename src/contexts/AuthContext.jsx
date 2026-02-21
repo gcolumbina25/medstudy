@@ -105,12 +105,50 @@ export const AuthProvider = ({ children }) => {
         return userCredential;
       } else {
         console.log('🆕 Usuário novo, verificando lista de emails permitidos...');
+        console.log('👤 E-mail do usuário autenticado:', user.email);
+        
         // Verificar se o e-mail está na lista de permitidos
         const allowedEmailsRef = collection(db, 'allowedEmails');
         const q = query(allowedEmailsRef, where('email', '==', user.email));
         const allowedSnapshot = await getDocs(q);
 
-        console.log('📧 Verificação de email - encontrados:', allowedSnapshot.size);
+        console.log('📧 Query executada - encontrados:', allowedSnapshot.size);
+        console.log('📧 Detalhes da query:', {
+          collection: 'allowedEmails',
+          field: 'email',
+          operator: '==',
+          value: user.email
+        });
+
+        // Log detalhado dos documentos encontrados
+        if (!allowedSnapshot.empty) {
+          console.log('✅ Documentos encontrados:');
+          allowedSnapshot.forEach((doc, index) => {
+            const data = doc.data();
+            console.log(`   Doc ${index + 1}:`, {
+              id: doc.id,
+              email: data.email,
+              isAdmin: data.isAdmin,
+              emailMatch: data.email === user.email,
+              emailLowerMatch: data.email?.toLowerCase() === user.email?.toLowerCase()
+            });
+          });
+        } else {
+          console.log('❌ Nenhum documento encontrado na coleção allowedEmails');
+          
+          // Tentar buscar todos os e-mails para debug
+          console.log('🔍 Buscando todos os e-mails permitidos para comparação...');
+          try {
+            const allEmailsSnapshot = await getDocs(allowedEmailsRef);
+            console.log('📧 Total de e-mails na coleção:', allEmailsSnapshot.size);
+            allEmailsSnapshot.forEach((doc) => {
+              const data = doc.data();
+              console.log('   -', data.email, '(ID:', doc.id + ')');
+            });
+          } catch (debugError) {
+            console.error('❌ Erro ao buscar todos os e-mails:', debugError);
+          }
+        }
 
         if (!allowedSnapshot.empty) {
           console.log('✅ Email encontrado na lista permitida');
