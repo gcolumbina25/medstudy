@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
 import styles from './Header.module.css';
 
 const Header = () => {
@@ -10,6 +11,9 @@ const Header = () => {
     await logout();
     navigate('/login');
   };
+
+  const [menuOpen, setMenuOpen] = useState(false);
+  const toggleMenu = () => setMenuOpen((s) => !s);
 
   return (
     <header className={styles.header}>
@@ -23,13 +27,26 @@ const Header = () => {
           <h2>MedStudy</h2>
         </Link>
 
-        <nav className={styles.nav}>
-          <Link to="/" className={styles.navLink}>Início</Link>
-          <Link to="/revisao" className={styles.navLink}>Revisão</Link>
-          <Link to="/biblioteca" className={styles.navLink}>Biblioteca</Link>
-          <Link to="/comunidade" className={styles.navLink}>Comunidade</Link> {/* Novo link */}
+        <button
+          className={styles.menuButton}
+          onClick={toggleMenu}
+          aria-expanded={menuOpen}
+          aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+        >
+          <div className={`${styles.burger} ${menuOpen ? styles.burgerOpen : ''}`}>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </button>
+
+        <nav className={`${styles.nav} ${menuOpen ? styles.navOpen : ''}`}>
+          <Link to="/" className={styles.navLink} onClick={() => setMenuOpen(false)}>Início</Link>
+          <Link to="/revisao" className={styles.navLink} onClick={() => setMenuOpen(false)}>Revisão</Link>
+          <Link to="/biblioteca" className={styles.navLink} onClick={() => setMenuOpen(false)}>Biblioteca</Link>
+          <Link to="/comunidade" className={styles.navLink} onClick={() => setMenuOpen(false)}>Comunidade</Link>
           {userData?.isAdmin && (
-            <Link to="/admin" className={styles.navLink}>Admin</Link>
+            <Link to="/admin" className={styles.navLink} onClick={() => setMenuOpen(false)}>Admin</Link>
           )}
         </nav>
 
