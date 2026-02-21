@@ -136,19 +136,16 @@ export const AuthProvider = ({ children }) => {
           console.log('❌ Email não encontrado na lista permitida');
           
           // REGISTRAR TENTATIVA NÃO AUTORIZADA
-          console.log('📝 Registrando tentativa não autorizada...');
+          console.log('📝 Registrando tentativa não autorizada para:', user.email);
           try {
             await addDoc(collection(db, 'unauthorizedAttempts'), {
               email: user.email,
-              uid: user.uid,
-              displayName: user.displayName,
-              attemptedAt: serverTimestamp(),
-              ipAddress: null, // Pode ser capturado no backend se necessário
-              userAgent: navigator.userAgent
+              attemptedAt: new Date()
             });
-            console.log('✅ Tentativa não autorizada registrada');
+            console.log('✅ Tentativa não autorizada registrada com sucesso');
           } catch (logError) {
-            console.warn('⚠️ Não foi possível registrar tentativa:', logError);
+            console.error('❌ Erro ao registrar tentativa não autorizada:', logError);
+            console.error('Detalhes do erro:', logError.code, logError.message);
           }
           
           // DESCONECTAR IMEDIATAMENTE por segurança

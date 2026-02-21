@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "yappmedstudy"
-  }
+    "default": "yappmedstudy",
+    "medstaging": "appmedstudy"
+  },
+  "targets": {},
+  "etags": {}
 }
