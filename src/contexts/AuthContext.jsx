@@ -14,7 +14,8 @@ import {
   query,
   where,
   getDocs,
-  setDoc
+  setDoc,
+  addDoc
 } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
 
@@ -133,6 +134,23 @@ export const AuthProvider = ({ children }) => {
           return userCredential;
         } else {
           console.log('❌ Email não encontrado na lista permitida');
+          
+          // REGISTRAR TENTATIVA NÃO AUTORIZADA
+          console.log('📝 Registrando tentativa não autorizada...');
+          try {
+            await addDoc(collection(db, 'unauthorizedAttempts'), {
+              email: user.email,
+              uid: user.uid,
+              displayName: user.displayName,
+              attemptedAt: serverTimestamp(),
+              ipAddress: null, // Pode ser capturado no backend se necessário
+              userAgent: navigator.userAgent
+            });
+            console.log('✅ Tentativa não autorizada registrada');
+          } catch (logError) {
+            console.warn('⚠️ Não foi possível registrar tentativa:', logError);
+          }
+          
           // DESCONECTAR IMEDIATAMENTE por segurança
           console.log('🚨 Desconectando usuário não autorizado...');
           setIsVerifyingAuth(false);

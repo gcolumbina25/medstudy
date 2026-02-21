@@ -29,7 +29,7 @@ const Login = () => {
       
       // Forçar popup independente da mensagem
       console.log('🚨 Mostrando popup de erro...');
-      window.alert(`🚫 ACESSO NEGADO - SEGURANÇA ATIVA\n\n${errorMessage}\n\nEsta plataforma possui controle de acesso rigoroso.\n\n📧 Entre em contato com o administrador para solicitar credenciais de acesso.`);
+      window.alert(`🚫 ACESSO NEGADO - SEGURANÇA ATIVA\n\n${errorMessage}\n\n📧 Entre em contato com o administrador para solicitar credenciais de acesso.`);
     } finally {
       console.log('🏁 Finalizando tentativa de login');
       setLoading(false);
