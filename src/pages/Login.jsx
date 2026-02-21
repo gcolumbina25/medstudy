@@ -10,6 +10,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleGoogleSignIn = async () => {
+    console.log('🎯 Botão de login clicado');
     setError('');
     setLoading(true);
     try {
@@ -18,17 +19,19 @@ const Login = () => {
       console.log('✅ Login bem-sucedido, redirecionando...');
       navigate('/');
     } catch (err) {
-      console.error('❌ Erro capturado no Login:', err);
+      console.error('❌ ERRO CAPTURADO NO LOGIN COMPONENT:', err);
+      console.error('❌ Mensagem do erro:', err.message);
+      console.error('❌ Stack do erro:', err.stack);
+      
       const errorMessage = err.message || 'Erro ao fazer login com o Google.';
+      console.log('📝 Definindo mensagem de erro:', errorMessage);
       setError(errorMessage);
       
-      // Mostrar popup de erro com destaque para segurança
-      if (errorMessage.includes('não cadastrado') || errorMessage.includes('não encontrado') || errorMessage.includes('não permitido')) {
-        window.alert(`🚫 ACESSO NEGADO - SEGURANÇA ATIVA\n\n${errorMessage}\n\nEsta plataforma possui controle de acesso rigoroso.\n\n📧 Entre em contato com o administrador para solicitar credenciais de acesso.`);
-      } else {
-        window.alert(`❌ ERRO NO LOGIN\n\n${errorMessage}\n\nTente novamente ou entre em contato com o suporte.`);
-      }
+      // Forçar popup independente da mensagem
+      console.log('🚨 Mostrando popup de erro...');
+      window.alert(`🚫 ACESSO NEGADO - SEGURANÇA ATIVA\n\n${errorMessage}\n\nEsta plataforma possui controle de acesso rigoroso.\n\n📧 Entre em contato com o administrador para solicitar credenciais de acesso.`);
     } finally {
+      console.log('🏁 Finalizando tentativa de login');
       setLoading(false);
     }
   };
