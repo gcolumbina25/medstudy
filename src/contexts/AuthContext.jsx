@@ -107,27 +107,19 @@ export const AuthProvider = ({ children }) => {
         console.log('🆕 Usuário novo, verificando lista de emails permitidos...');
         console.log('👤 E-mail do usuário autenticado:', user.email);
         
-        // Verificar se o e-mail está na lista de permitidos
-        const allowedEmailsRef = collection(db, 'allowedEmails');
-        const q = query(allowedEmailsRef, where('email', '==', user.email));
-        const allowedSnapshot = await getDocs(q);
+        try {
+          // Verificar se o e-mail está na lista de permitidos
+          const allowedEmailsRef = collection(db, 'allowedEmails');
+          const q = query(allowedEmailsRef, where('email', '==', user.email));
+          console.log('🔍 Executando query na coleção allowedEmails...');
+          const allowedSnapshot = await getDocs(q);
 
-        console.log('📧 Query executada - encontrados:', allowedSnapshot.size);
-        console.log('📧 Detalhes da query:', {
-          collection: 'allowedEmails',
-          field: 'email',
-          operator: '==',
-          value: user.email
-        });
+          console.log('📧 Query concluída - encontrados:', allowedSnapshot.size, 'documentos');
 
-        // Log detalhado dos documentos encontrados
-        if (!allowedSnapshot.empty) {
-          console.log('✅ Documentos encontrados:');
-          allowedSnapshot.forEach((doc, index) => {
-            const data = doc.data();
-            console.log(`   Doc ${index + 1}:`, {
-              id: doc.id,
-              email: data.email,
+          if (!allowedSnapshot.empty) {
+            console.log('✅ E-mail encontrado na lista permitida!');
+            const emailData = allowedSnapshot.docs[0].data();
+            console.log('📄 Dados do e-mail:', emailData);
               isAdmin: data.isAdmin,
               emailMatch: data.email === user.email,
               emailLowerMatch: data.email?.toLowerCase() === user.email?.toLowerCase()

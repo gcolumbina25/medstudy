@@ -16,7 +16,6 @@ import { db } from '../config/firebase';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
 import UnauthorizedAttempts from '../components/UnauthorizedAttempts';
-import TestAllowedEmails from '../components/TestAllowedEmails';
 import styles from './AdminPage.module.css';
 
 const AdminPage = () => {
