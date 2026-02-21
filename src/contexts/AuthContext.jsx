@@ -26,6 +26,7 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isVerifyingAuth, setIsVerifyingAuth] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -53,9 +54,16 @@ export const AuthProvider = ({ children }) => {
             console.warn('⚠️ Could not update last access:', error);
           }
         } else {
-          console.log('⚠️ User document not found - signInWithGoogle should handle this');
-          // Não fazer signOut aqui - deixar o signInWithGoogle decidir
+          console.log('⚠️ User document not found');
           setUserData(null);
+          
+          // Só desconectar se não estamos no meio de uma verificação de autenticação
+          if (!isVerifyingAuth) {
+            console.log('🚨 Usuário sem documento válido - desconectando por segurança');
+            await signOut(auth);
+          } else {
+            console.log('⏳ Aguardando verificação de autenticação...');
+          }
         }
       } else {
         console.log('🚪 No user, clearing state');
@@ -70,6 +78,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const signInWithGoogle = async () => {
+    setIsVerifyingAuth(true);
     const provider = new GoogleAuthProvider();
     try {
       console.log('🔐 Iniciando login com Google...');
@@ -124,12 +133,16 @@ export const AuthProvider = ({ children }) => {
           return userCredential;
         } else {
           console.log('❌ Email não encontrado na lista permitida');
-          // Não fazer signOut aqui - deixar o Login component decidir
+          // DESCONECTAR IMEDIATAMENTE por segurança
+          console.log('🚨 Desconectando usuário não autorizado...');
+          setIsVerifyingAuth(false);
+          await signOut(auth);
           throw new Error('Usuário não cadastrado na plataforma. Por favor, entre em contato com o administrador.');
         }
       }
     } catch (error) {
       console.error('❌ Erro no login:', error);
+      setIsVerifyingAuth(false);
       throw error;
     }
   };
@@ -143,7 +156,8 @@ export const AuthProvider = ({ children }) => {
     userData,
     signInWithGoogle,
     logout,
-    loading
+    loading,
+    isVerifyingAuth
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
